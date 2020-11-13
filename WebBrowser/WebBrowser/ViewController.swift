@@ -53,7 +53,10 @@ class ViewController: UIViewController {
     }
     
     @IBAction func reloadPage() {
-        webView.reload()
+        guard let currentUrl = webView.backForwardList.currentItem else {
+            return
+        }
+        webView.go(to: currentUrl)
     }
     
     @IBAction func tappedMoveToURLButton(_ sender: UIButton) {
