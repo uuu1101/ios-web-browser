@@ -22,29 +22,34 @@ class ViewController: UIViewController {
         
         searchBarURL.delegate = self
         webView.navigationDelegate = self
+        
         initialScreenLabel.isHidden = true
         goBackButton.isEnabled = webView.canGoBack
-        goForwardButton.isEnabled = webView.canGoBack
+        goForwardButton.isEnabled = webView.canGoForward
         
-        let initialURLString = " "
+        let initialURLString = "https://www.naver.com"
         
-        guard convertStringToURL(of: initialURLString) != nil else {
+        guard let initialURL = convertStringToURL(of: initialURLString) else {
             initialScreenLabel.isHidden = false
             initialScreenLabel.text = "이동하고 싶은 URL 값을 입력해주세요."
             return
         }
+        
+        loadWebView(of: initialURL)
     }
     
     @IBAction func goBack() {
-        if webView.canGoBack {
-            webView.goBack()
+        guard let previousUrl = webView.backForwardList.backItem else {
+            return
         }
+        webView.go(to: previousUrl)
     }
     
     @IBAction func goForward() {
-        if webView.canGoForward {
-            webView.goForward()
+        guard let nextUrl = webView.backForwardList.forwardItem else {
+            return
         }
+        webView.go(to: nextUrl)
     }
     
     @IBAction func reloadPage() {
@@ -99,7 +104,6 @@ extension ViewController {
             showCurrentAddress()
             return nil
         }
-        
         return validUrl
     }
     
@@ -108,7 +112,7 @@ extension ViewController {
         searchBarURL.text = currentAddress?.absoluteString
     }
     
-    private func showUrlErrorAlert(){
+    private func showUrlErrorAlert() {
         let notFoundURLAlert = UIAlertController(title: "Not Found", message: "입력한 주소가 올바른 형태가 아닙니다.", preferredStyle: .alert)
         let exitAction = UIAlertAction(title: "닫기", style: .default, handler: nil)
         notFoundURLAlert.addAction(exitAction)
